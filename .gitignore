@@ -1,2 +1,2 @@
-./scraper/.idea
-./scraper/venv
+./scraper/.idea/*
+./scraper/venv/*
