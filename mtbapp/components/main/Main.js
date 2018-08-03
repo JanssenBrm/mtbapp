@@ -9,8 +9,8 @@ export default class Main extends Component {
         return (
             <Router>
                 <Scene key="root">
-                    <Scene key="ridelist" component={RideList} title="Ride Overview" initial/>
-                    <Scene key="ridedetail" component={RideDetails} title="Ride Details"/>
+                    <Scene key="ridelist" component={RideList} title="Ride Overview" hideNavBar={true} initial/>
+                    <Scene key="ridedetail" component={RideDetails} title="Ride Details" hideNavBar={true}/>
                 </Scene>
             </Router>
         );
