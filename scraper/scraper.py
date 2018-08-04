@@ -6,6 +6,9 @@ import logging
 import pyrebase
 from bs4 import BeautifulSoup
 import requests
+import datetime
+import time
+import pytz
 
 def setupLogger():
     logger = logging.getLogger('scraper')
@@ -44,6 +47,10 @@ class FireBaseWriter:
         self.logger.info('Writing ride %s to firebase database' % ride)
         results = self.db.child("rides").push(ride, self.user['idToken'])
 
+    def clear(self):
+        self.logger.info('Clearing rides database')
+        self.db.child("rides").remove(self.user['idToken'])
+
 
 class MTBYouScraper:
 
@@ -58,6 +65,7 @@ class MTBYouScraper:
 
     def scrapeCalendar(self):
         self.logger.info('Scraping %s' % self.url)
+        accomodations = self.accomodations();
         soup = BeautifulSoup(requests.get(self.url).content, 'html.parser')
         pageRides = soup.find_all('tr', attrs={'class': ['tr1', 'tr2']})
         for ride in pageRides:
@@ -65,7 +73,7 @@ class MTBYouScraper:
             rideDetails = ride.find_all('td', attrs={'class', 'kalender_detail'})
 
             ride = dict()
-            ride['date'] = rideDetails[1].text
+            ride['date'] = pytz.timezone('UTC').localize(datetime.datetime.strptime(rideDetails[1].text, '%d/%m/%Y')).strftime('%s')
             ride['location'] = rideDetails[2].text
             ride['distance'] = rideDetails[3].text
             ride['time'] = rideDetails[4].text
@@ -75,6 +83,7 @@ class MTBYouScraper:
 
             rideInfoBlocks = rideSoup.find_all('table', attrs={'class', 'kalender_overzicht2'})
 
+            ride['source'] = rideUrl
             ride['address'] = ''
             for part in rideInfoBlocks[0].find('span', attrs={'class', 'titelke'}).parent.contents:
                 if not str(part.encode('utf-8')).startswith('<'):
@@ -89,8 +98,29 @@ class MTBYouScraper:
                     nextPrice = False
                     ride['price'] = str(part.encode('utf-8'))
 
+            ride['accommodation'] = dict()
+            for part in rideInfoBlocks[4].find_all('img'):
+                key = accomodations[part['title']]
+                if key:
+                    ride['accommodation'][key] = ('True' in part['src'])
+
+
+
+
             self.logger.info('Details %s' % ride)
             self.db.add(ride)
+
+    def accomodations(self):
+        accomodations = dict()
+        accomodations['Bewaakte fietsenstalling'] = 'bikecorner_guarded'
+        accomodations['Wasgelegenheid'] = 'wash'
+        accomodations['Douches'] = 'showers'
+        accomodations['Douches (+kleedk)'] = 'showers'
+        accomodations['Afspuitstand'] = 'bike_clean'
+        accomodations['Huur mountainbike'] = 'bike_rent'
+        accomodations['Kids toer'] = 'kids_tour'
+        return accomodations
+
 
 
 
@@ -98,5 +128,6 @@ logger = setupLogger();
 
 db = FireBaseWriter(logger)
 
+db.clear()
 scraper = MTBYouScraper(logger, db)
 scraper.scrape()
