@@ -42,7 +42,6 @@ class RideList extends React.Component {
 
 
     getRideListItem({item, index}){
-        Moment.locale('nl');
         return (
             <ListItem
                 roundAvatar
@@ -52,7 +51,7 @@ class RideList extends React.Component {
                 titleStyle={styles.title}
                 subtitle={
                     <View style={styles.description}>
-                        <Text style={styles.description_item}>{Moment(item.date, "dd/MM/yyyy").format('ddd d MMMM YYYY')}</Text>
+                        <Text style={styles.description_item}>{Moment(item.date, "DD/MM/YYYY").format('ddd D MMMM YYYY')}</Text>
                         <Text style={styles.description_item}>{item.distance}</Text>
                     </View>
                 }

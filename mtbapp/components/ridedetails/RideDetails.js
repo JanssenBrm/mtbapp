@@ -8,28 +8,50 @@ import {ListItem} from "react-native-elements";
 import {AppHeader} from "../header/AppHeader";
 import {Actions} from 'react-native-router-flux';
 import {MapView} from "expo";
+import {getRideLocationData} from "../../actions/DataActions";
 
 export class RideDetails extends React.Component {
 
+    state = {
+        location: null
+    };
+
+    delta = 0.05;
+
     constructor(props){
         super(props);
+        getRideLocationData(this.props.ride.location).then(result => {
+            this.setState({location: result})
+        })
     }
     render() {
+
 
         return (
             <View style={styles.container}>
                 <AppHeader back={true}/>
                 <Text style={styles.pageTitle}>{this.props.ride.location}</Text>
                 <View style={styles.infoView}>
-                    <MapView
-                        style={styles.mapView}
-                        initialRegion={{
-                            latitude: 37.78825,
-                            longitude: -122.4324,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421,
-                        }}
-                    />
+                    {
+                       this.state.location? <MapView
+                            style={styles.mapView}
+                            initialRegion={{
+                                longitude: this.state.location.center[0],
+                                latitude: this.state.location.center[1],
+                                longitudeDelta: this.delta,
+                                latitudeDelta: this.delta,
+                            }}
+                        >
+                           <MapView.Marker
+                               key={this.props.ride.location}
+                               coordinate={{
+                                   latitude: this.state.location.center[1],
+                                   longitude: this.state.location.center[0],
+                               }}
+                               title={this.props.ride.location}
+                           />
+                       </MapView>: null
+                    }
                     <View style={styles.details}>
                         <Text>{this.props.ride.location}</Text>
                     </View>
