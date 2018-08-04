@@ -85,9 +85,22 @@ class MTBYouScraper:
 
             ride['source'] = rideUrl
             ride['address'] = ''
+
+            nextAddress = ''
+            ride['address'] = dict()
             for part in rideInfoBlocks[0].find('span', attrs={'class', 'titelke'}).parent.contents:
+
+                if 'Locatie' in str(part.encode('utf-8')):
+                    nextAddress = 'location'
+                elif 'Adres' in str(part.encode('utf-8')):
+                    nextAddress = 'street'
+                elif 'Gemeente' in str(part.encode('utf-8')):
+                    nextAddress = 'city'
+
                 if not str(part.encode('utf-8')).startswith('<'):
-                    ride['address'] += part + '<br/>'
+                    ride['address'][nextAddress] = part
+
+
 
             nextPrice = False
             for part in rideInfoBlocks[1].find('span', attrs={'class', 'titelke'}).parent.contents:
