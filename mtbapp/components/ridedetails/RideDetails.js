@@ -3,12 +3,15 @@ import * as DataActions from '../../actions/DataActions';
 import * as AuthActions from '../../actions/AuthActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {ActivityIndicator, FlatList, View, StyleSheet, Text} from "react-native";
+import {ActivityIndicator, FlatList, View, StyleSheet, Text, ScrollView} from "react-native";
 import {ListItem} from "react-native-elements";
 import {AppHeader} from "../header/AppHeader";
 import {Actions} from 'react-native-router-flux';
 import {MapView} from "expo";
 import {getRideLocationData} from "../../actions/DataActions";
+import {RideInfo} from "../rideinfo/RideInfo";
+import {RideActions} from "../rideactions/RideActions";
+import {RideAccomodations} from "../rideaccomodations/RideAccomodations";
 
 export class RideDetails extends React.Component {
 
@@ -20,7 +23,7 @@ export class RideDetails extends React.Component {
 
     constructor(props){
         super(props);
-        getRideLocationData(this.props.ride.location).then(result => {
+        getRideLocationData(this.props.ride.address).then(result => {
             this.setState({location: result})
         })
     }
@@ -31,7 +34,7 @@ export class RideDetails extends React.Component {
             <View style={styles.container}>
                 <AppHeader back={true}/>
                 <Text style={styles.pageTitle}>{this.props.ride.location}</Text>
-                <View style={styles.infoView}>
+                <ScrollView style={styles.infoView}>
                     {
                        this.state.location? <MapView
                             style={styles.mapView}
@@ -53,9 +56,17 @@ export class RideDetails extends React.Component {
                        </MapView>: null
                     }
                     <View style={styles.details}>
-                        <Text>{this.props.ride.location}</Text>
+                        <Text style={styles.title}>Information</Text>
+                        <RideInfo ride={this.props.ride}/>
                     </View>
-                </View>
+                    <View style={styles.accomodations}>
+                        <Text style={styles.title}>Accomodations</Text>
+                        <RideAccomodations ride={this.props.ride}/>
+                    </View>
+                    <View style={styles.actions}>
+                        <RideActions ride={this.props.ride}/>
+                    </View>
+                </ScrollView>
             </View>
         );
 
@@ -68,18 +79,36 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
     },
-    infoView: {
+
+    title: {
+        fontSize: 16,
+        fontFamily: 'roboto-bold',
+        marginLeft:15,
+        marginRight:15,
+        marginTop: 15,
+        padding: 10,
+        backgroundColor: '#5a84cc',
+        color: '#FFFFFF'
+    },
+     infoView: {
         flex: 1,
-        flexDirection: 'column',
+      /*  flexDirection: 'column',
         alignItems: 'stretch',
-        justifyContent: 'space-between',
+        justifyContent: 'space-between',*/
     },
     mapView: {
-        flex: 1
+        minHeight: 200
     },
 
     details: {
-        flex: 2
+        minHeight: 400,
+        alignItems: 'stretch'
+    },
+    accomodations: {
+        minHeight: 300,
+    },
+    actions: {
+        flex: 1
     },
     pageTitle: {
         fontSize:18,

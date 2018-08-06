@@ -7,7 +7,7 @@ import {ActivityIndicator, FlatList, View, StyleSheet, ScrollView} from "react-n
 import {Divider, ListItem, Text} from "react-native-elements";
 import {Actions} from 'react-native-router-flux';
 import {AppHeader} from "../header/AppHeader";
-import Moment from 'moment';
+import Moment from 'moment-timezone';
 
 class RideList extends React.Component {
 
@@ -51,7 +51,7 @@ class RideList extends React.Component {
                 titleStyle={styles.title}
                 subtitle={
                     <View style={styles.description}>
-                        <Text style={styles.description_item}>{Moment(item.date, "DD/MM/YYYY").format('ddd D MMMM YYYY')}</Text>
+                        <Text style={styles.description_item}>{Moment.unix(item.date).format('ddd D MMMM YYYY')}</Text>
                         <Text style={styles.description_item}>{item.distance}</Text>
                     </View>
                 }
