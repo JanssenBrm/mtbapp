@@ -62,8 +62,7 @@ export class RideActions extends React.Component {
         const wazeUrl = `waze://?q=${this.props.ride.address.location},${this.props.ride.address.street},${this.props.ride.address.city}`;
         const mapsUrl = `${Platform.OS == 'android' ? 'geo' : 'maps'}:${this.state.location.center[1]},${this.state.location.center[0]}`;
 
-        console.log(Linking.canOpenURL(wazeUrl))
-       Linking.canOpenURL(wazeUrl).then(supported => {
+        Linking.canOpenURL(wazeUrl).then(supported => {
 
            if(supported){
                Linking.openURL(wazeUrl);
@@ -77,9 +76,9 @@ export class RideActions extends React.Component {
                })
            }
 
-       }).catch(err => {
-           console.error("Error when opening URL", err);
-       })
+        }).catch(err => {
+            console.error("Error when opening URL", err);
+        });
     }
 }
 
