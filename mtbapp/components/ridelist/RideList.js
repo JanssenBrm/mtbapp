@@ -4,7 +4,7 @@ import * as AuthActions from '../../actions/AuthActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {ActivityIndicator, FlatList, View, StyleSheet, ScrollView} from "react-native";
-import {Divider, ListItem, Text} from "react-native-elements";
+import {Divider, Icon, ListItem, Text} from "react-native-elements";
 import {Actions} from 'react-native-router-flux';
 import {AppHeader} from "../header/AppHeader";
 import Moment from 'moment-timezone';
@@ -14,10 +14,9 @@ class RideList extends React.Component {
     constructor(props){
         super(props);
 
-        this.props.getRideData();
+        this.props.getRideData(false);
     }
     render() {
-        console.log("RENDERING", this.props);
         if (this.props.loading) {
             return (
                 <View style={styles.activityIndicatorContainer}>
@@ -34,6 +33,8 @@ class RideList extends React.Component {
                         data={this.props.rides}
                         renderItem={this.getRideListItem}
                         style={styles.listView}
+                        onRefresh={() => {this.props.getRideData(true);}}
+                        refreshing={this.props.refresh}
                     />
                 </View>
             );
@@ -47,8 +48,12 @@ class RideList extends React.Component {
                 roundAvatar
                 key={item.id}
                 leftIcon={{name: 'directions-bike'}}
-                title={item.location}
-                titleStyle={styles.title}
+                title={
+                    <View style={styles.title}>
+                        <Text style={styles.title_item}>{item.location}</Text>
+                        {item.traveldistance ? (<Text style={styles.title_item}><Icon name='navigation' size='12'/>{item.traveldistance} km</Text>) : null}
+                    </View>
+                }
                 subtitle={
                     <View style={styles.description}>
                         <Text style={styles.description_item}>{Moment.unix(item.date).format('ddd D MMMM YYYY')}</Text>
@@ -91,6 +96,12 @@ const styles = StyleSheet.create({
     },
 
     title:{
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+
+    title_item: {
         fontSize: 15,
         fontFamily: 'roboto-bold'
     },

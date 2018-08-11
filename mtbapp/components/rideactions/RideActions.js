@@ -8,18 +8,8 @@ import {WebBrowser} from "expo";
 
 export class RideActions extends React.Component {
 
-    state = {
-        location: null
-    };
-
-
-    delta = 0.05;
-
     constructor(props) {
         super(props);
-        getRideLocationData(this.props.ride.address).then(result => {
-            this.setState({location: result})
-        })
     }
 
     render() {
@@ -60,7 +50,7 @@ export class RideActions extends React.Component {
 
         const gmapsUrl = `comgooglemaps://?q=${this.props.ride.address.location},${this.props.ride.address.street},${this.props.ride.address.city}`;
         const wazeUrl = `waze://?q=${this.props.ride.address.location},${this.props.ride.address.street},${this.props.ride.address.city}`;
-        const mapsUrl = `${Platform.OS == 'android' ? 'geo' : 'maps'}:${this.state.location.center[1]},${this.state.location.center[0]}`;
+        const mapsUrl = `${Platform.OS == 'android' ? 'geo' : 'maps'}:${this.props.ride.geolocation.center[1]},${this.props.ride.geolocation.center[0]}`;
 
         Linking.canOpenURL(wazeUrl).then(supported => {
 

@@ -15,17 +15,10 @@ import {RideAccomodations} from "../rideaccomodations/RideAccomodations";
 
 export class RideDetails extends React.Component {
 
-    state = {
-        location: null
-    };
-
     delta = 0.05;
 
     constructor(props){
         super(props);
-        getRideLocationData(this.props.ride.address).then(result => {
-            this.setState({location: result})
-        })
     }
     render() {
 
@@ -36,11 +29,11 @@ export class RideDetails extends React.Component {
                 <Text style={styles.pageTitle}>{this.props.ride.location}</Text>
                 <ScrollView style={styles.infoView}>
                     {
-                       this.state.location? <MapView
+                        this.props.ride.geolocation.center? <MapView
                             style={styles.mapView}
                             initialRegion={{
-                                longitude: this.state.location.center[0],
-                                latitude: this.state.location.center[1],
+                                longitude: this.props.ride.geolocation.center[0],
+                                latitude: this.props.ride.geolocation.center[1],
                                 longitudeDelta: this.delta,
                                 latitudeDelta: this.delta,
                             }}
@@ -48,8 +41,8 @@ export class RideDetails extends React.Component {
                            <MapView.Marker
                                key={this.props.ride.location}
                                coordinate={{
-                                   latitude: this.state.location.center[1],
-                                   longitude: this.state.location.center[0],
+                                   latitude: this.props.ride.geolocation.center[1],
+                                   longitude: this.props.ride.geolocation.center[0],
                                }}
                                title={this.props.ride.location}
                            />
