@@ -30,7 +30,6 @@ export class RideActions extends React.Component {
                 />
                 <Button
                     title='Open website'
-                    titleStyle={styles.buttonText}
                     buttonStyle={styles.button}
                     icon={{
                         name: 'open-in-browser',

@@ -101,7 +101,8 @@ const styles = StyleSheet.create({
         minHeight: 300,
     },
     actions: {
-        flex: 1
+        flex: 1,
+        padding:15
     },
     pageTitle: {
         fontSize:18,

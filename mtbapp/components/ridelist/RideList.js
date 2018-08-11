@@ -4,16 +4,19 @@ import * as AuthActions from '../../actions/AuthActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {ActivityIndicator, FlatList, View, StyleSheet, ScrollView} from "react-native";
-import {Divider, Icon, ListItem, Text} from "react-native-elements";
+import {Divider, Icon, ListItem, Text, Input} from "react-native-elements";
 import {Actions} from 'react-native-router-flux';
 import {AppHeader} from "../header/AppHeader";
 import Moment from 'moment-timezone';
 
 class RideList extends React.Component {
 
+    state = {
+        search: false
+    };
+
     constructor(props){
         super(props);
-
         this.props.getRideData(false);
     }
     render() {
@@ -27,10 +30,33 @@ class RideList extends React.Component {
             return (
                 <View style={styles.container}>
                     <AppHeader/>
-                    <Text style={styles.pageTitle}>Overview of rides</Text>
+                    <View style={styles.pageHeader}>
+                        <Text style={styles.pageTitle}>Overview of rides</Text>
+                        <View style={styles.actions}>
+                            <Icon name='search' color={this.props.search ? '#3D6DCC' : null} onPress={() => { this.props.toggleSearch(!this.props.search)}}/>
+                        </View>
+                    </View>
+
+
+                    {
+                        this.props.search ? (
+                            <View style={styles.actionBar}>
+                                <Input
+                                    placeholder='Search for rides'
+                                    rightIcon={
+                                        <Icon
+                                            name='search'
+                                        />
+                                    }
+                                    onChangeText={(text) => { this.props.filterRides(text)}}
+                                    containerStyle={styles.searchBar}
+                                />
+                            </View>
+                        ) : null
+                    }
                     <FlatList
                         ref='listRef'
-                        data={this.props.rides}
+                        data={this.filterRides(this.props.rides, this.props.filter)}
                         renderItem={this.getRideListItem}
                         style={styles.listView}
                         onRefresh={() => {this.props.getRideData(true);}}
@@ -42,12 +68,21 @@ class RideList extends React.Component {
     }
 
 
+    filterRides(rides, filterQuery) {
+
+        return rides.filter(ride => ride.location.indexOf(filterQuery) >= 0);
+    }
     getRideListItem({item, index}){
         return (
             <ListItem
                 roundAvatar
                 key={item.id}
-                leftIcon={{name: 'directions-bike'}}
+                leftIcon={
+                    <Icon
+                        name={'directions-bike'}
+                        color={'#bfbfbf'}
+                        />
+                }
                 title={
                     <View style={styles.title}>
                         <Text style={styles.title_item}>{item.location}</Text>
@@ -80,12 +115,12 @@ const styles = StyleSheet.create({
     listItem: {
         backgroundColor: 'white'
     },
-    pageTitle: {
-        fontSize:18,
-        fontFamily: 'monserat',
-        paddingTop:20,
-        paddingBottom:20,
-        textAlign: 'center',
+
+    pageHeader:{
+        flex: 0.05,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding:20,
         backgroundColor: 'white',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -93,6 +128,17 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 1,
         zIndex:99
+    },
+
+    actionActive: {
+      color: '#5a84cc'
+    },
+
+    pageTitle: {
+        fontSize:18,
+        fontFamily: 'monserat',
+        textAlign: 'center',
+        flex:6
     },
 
     title:{
@@ -122,6 +168,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
+    },
+
+    searchBar:{
+        paddingLeft:20,
+        paddingRight:20,
+        paddingBottom: 5,
+        paddingTop:5,
+        backgroundColor: 'white',
+        margin:10,
+        borderRadius: 50
+    },
+
+    actionBar: {
+        flex: 0.15,
+        flexDirection: 'row',
+        justifyContent: 'center'
     }
 
 

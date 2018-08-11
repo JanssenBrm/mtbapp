@@ -6,9 +6,11 @@ import { Constants, Location, Permissions } from 'expo';
 export const LOAD_DATA_START = 'LOAD_DATA_START';
 export const LOAD_DATA_ERROR = 'LOAD_DATA_ERROR';
 export const LOAD_DATA_DONE = 'LOAD_DATA_DONE';
+export const TOGGLE_SEARCH = 'TOGGLE_SEARCH';
+export const SET_FILTER = 'SET_FILTER';
 
 
-export function getRideData(refresh){
+ export function getRideData(refresh) {
     return (dispatch) => {
 
         dispatch({type: LOAD_DATA_START, data: {refresh: refresh}});
@@ -19,7 +21,6 @@ export function getRideData(refresh){
             if(snapshot.val()) {
 
                 getLocationAsync().then(location => {
-                    console.log(location);
                     Object.keys(snapshot.val()).forEach(key => {
                         rideInfo = snapshot.val()[key];
                         rideInfo.traveldistance = rideInfo.geolocation.center ? getTravelDistance(location, rideInfo.geolocation) : null;
@@ -35,6 +36,19 @@ export function getRideData(refresh){
 
     };
 }
+
+export function toggleSearch(search){
+     return (dispatch) => {
+         dispatch({type: TOGGLE_SEARCH, data: {search: search}})
+     };
+}
+
+export function filterRides(filter){
+    return (dispatch) => {
+        dispatch({type: SET_FILTER, data: {filter: filter}})
+    };
+}
+
 
 getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
