@@ -37,9 +37,11 @@
     "react-native-redux-listener": "^0.3.0",
     "react-native-router-flux": "^4.0.0-beta.31",
     "react-native-size-matters": "^0.1.2",
+    "react-native-weather": "^0.2.11",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
     "redux-axios-middleware": "^4.0.0",
+    "redux-observable": "^1.0.0",
     "redux-thunk": "^2.3.0"
   }
 }

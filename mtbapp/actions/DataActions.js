@@ -11,22 +11,31 @@ export const SET_FILTER = 'SET_FILTER';
 
 
  export function getRideData(refresh) {
+     let promises = [];
     return (dispatch) => {
 
+        const disp = dispatch;
         dispatch({type: LOAD_DATA_START, data: {refresh: refresh}});
 
         database.ref('rides').orderByChild('date').startAt(Math.floor((Date.now() - (24 * 60 * 60 * 1000)) / 1000)).once('value', function (snapshot) {
 
-            rides = [];
             if(snapshot.val()) {
 
                 getLocationAsync().then(location => {
                     Object.keys(snapshot.val()).forEach(key => {
                         rideInfo = snapshot.val()[key];
-                        rideInfo.traveldistance = rideInfo.geolocation.center ? getTravelDistance(location, rideInfo.geolocation) : null;
-                        rides.push({...rideInfo, id: key});
+
+                        if(rideInfo.geolocation.center){
+                            rideInfo.traveldistance = getTravelDistance(location, rideInfo.geolocation);
+                            promises.push(getWeatherConditions(rideInfo));
+
+                        }
                     });
-                    dispatch({type: LOAD_DATA_DONE, data: {rides: rides, refresh: refresh}});
+
+                    Promise.all(promises).then(data => {
+                        dispatch({type: LOAD_DATA_DONE, data: {rides: data, refresh: refresh}})
+                    });
+
                 });
 
 
@@ -36,6 +45,8 @@ export const SET_FILTER = 'SET_FILTER';
 
     };
 }
+
+
 
 export function toggleSearch(search){
      return (dispatch) => {
@@ -49,6 +60,16 @@ export function filterRides(filter){
     };
 }
 
+ getWeatherConditions = (ride) => {
+     console.log(ride);
+     const url = `https://api.darksky.net/forecast/fde78bde567300516c4e3cff1f929094/${ride.geolocation.center[1]},${ride.geolocation.center[0]},${ride.date}?exclude=currently,hourly,flags`;
+     return fetch(url)
+         .then(data => data.json())
+         .then(data => {
+             ride.weatherConditions = data.daily && data.daily.data && data.daily.data.length > 0 ? data.daily.data[0] : null;
+             return ride;
+         });
+};
 
 getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);

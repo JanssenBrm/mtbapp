@@ -10,7 +10,7 @@ let dataState = {
 };
 
 const dataReducer = (state = dataState, action) => {
-    console.log(action.type, action.data);
+    //console.log(action.type, action.data);
     switch ( action.type ){
         case LOAD_DATA_START:
             if (action.data.refresh) {

@@ -3,11 +3,12 @@ import * as DataActions from '../../actions/DataActions';
 import * as AuthActions from '../../actions/AuthActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {ActivityIndicator, FlatList, View, StyleSheet, ScrollView} from "react-native";
-import {Divider, Icon, ListItem, Text, Input} from "react-native-elements";
+import {ActivityIndicator, FlatList, View, StyleSheet, ScrollView, Image} from "react-native";
+import {Divider, Icon, ListItem, Text, Input, Avatar} from "react-native-elements";
 import {Actions} from 'react-native-router-flux';
 import {AppHeader} from "../header/AppHeader";
 import Moment from 'moment-timezone';
+import {WEATHER_ICONS} from "../../mapping/weathericons.mapping";
 
 class RideList extends React.Component {
 
@@ -86,7 +87,11 @@ class RideList extends React.Component {
                 title={
                     <View style={styles.title}>
                         <Text style={styles.title_item}>{item.location}</Text>
+                        <View style={styles.title_info}>
                         {item.traveldistance ? (<Text style={styles.title_item}><Icon name='navigation' size='12'/>{item.traveldistance} km</Text>) : null}
+                        {item.weatherConditions ? (
+                            <Text style={styles.title_item}><Avatar source={WEATHER_ICONS[item.weatherConditions.icon]} size='small' containerStyle={styles.weatherIcon} overlayContainerStyle={styles.weatherIconContainer}  /></Text>) : null}
+                        </View>
                     </View>
                 }
                 subtitle={
@@ -152,6 +157,12 @@ const styles = StyleSheet.create({
         fontFamily: 'roboto-bold'
     },
 
+    title_info: {
+        flexDirection: 'row',
+        textAlign: 'right',
+        fontSize: 12
+    },
+
     description:{
         flex: 1,
         flexDirection: 'row',
@@ -184,6 +195,17 @@ const styles = StyleSheet.create({
         flex: 0.15,
         flexDirection: 'row',
         justifyContent: 'center'
+    },
+
+    weatherIcon: {
+        height:12,
+    },
+
+    weatherIconContainer: {
+        backgroundColor: 'white',
+        height:12,
+        marginLeft: 5,
+        marginTop: 2
     }
 
 
