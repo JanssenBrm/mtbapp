@@ -12,6 +12,7 @@ import {getRideLocationData} from "../../actions/DataActions";
 import {RideInfo} from "../rideinfo/RideInfo";
 import {RideActions} from "../rideactions/RideActions";
 import {RideAccomodations} from "../rideaccomodations/RideAccomodations";
+import {RideWeatherConditions} from "../rideweatherconditions/RideWeatherConditions";
 
 export class RideDetails extends React.Component {
 
@@ -55,6 +56,10 @@ export class RideDetails extends React.Component {
                     <View style={styles.accomodations}>
                         <Text style={styles.title}>Accomodations</Text>
                         <RideAccomodations ride={this.props.ride}/>
+                    </View>
+                    <View style={styles.weatherinfo}>
+                        <Text style={styles.title}>Weather Conditions</Text>
+                        <RideWeatherConditions ride={this.props.ride}/>
                     </View>
                     <View style={styles.actions}>
                         <RideActions ride={this.props.ride}/>

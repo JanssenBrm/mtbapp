@@ -62,7 +62,7 @@ export function filterRides(filter){
 
  getWeatherConditions = (ride) => {
      console.log(ride);
-     const url = `https://api.darksky.net/forecast/fde78bde567300516c4e3cff1f929094/${ride.geolocation.center[1]},${ride.geolocation.center[0]},${ride.date}?exclude=currently,hourly,flags`;
+     const url = `https://api.darksky.net/forecast/fde78bde567300516c4e3cff1f929094/${ride.geolocation.center[1]},${ride.geolocation.center[0]},${ride.date}?exclude=currently,hourly,flags&units=ca`;
      return fetch(url)
          .then(data => data.json())
          .then(data => {

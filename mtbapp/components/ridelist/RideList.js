@@ -90,7 +90,7 @@ class RideList extends React.Component {
                         <View style={styles.title_info}>
                         {item.traveldistance ? (<Text style={styles.title_item}><Icon name='navigation' size='12'/>{item.traveldistance} km</Text>) : null}
                         {item.weatherConditions ? (
-                            <Text style={styles.title_item}><Avatar source={WEATHER_ICONS[item.weatherConditions.icon]} size='small' containerStyle={styles.weatherIcon} overlayContainerStyle={styles.weatherIconContainer}  /></Text>) : null}
+                            <Text style={styles.title_item}><Avatar source={WEATHER_ICONS[item.weatherConditions.icon].icon} size='small' containerStyle={styles.weatherIcon} overlayContainerStyle={styles.weatherIconContainer}  /></Text>) : null}
                         </View>
                     </View>
                 }
@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
 
     weatherIcon: {
         height:12,
+        marginLeft: 10
     },
 
     weatherIconContainer: {

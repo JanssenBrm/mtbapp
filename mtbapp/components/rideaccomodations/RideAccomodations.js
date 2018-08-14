@@ -51,6 +51,7 @@ export class RideAccomodations extends React.Component {
             title={item.item.key}
             containerStyle={styles.listItem}
             subtitle={item.item.value ? 'Available' : 'Not available'}
+            subtitleStyle={styles.subtitle}
             rightIcon={item.item.value ? (
                 <Icon
                     name='done'
@@ -79,5 +80,12 @@ const styles = StyleSheet.create({
 
     listItem: {
         borderBottomWidth: 0
-    }
+    },
+
+    subtitle: {
+        fontStyle: 'italic',
+        fontSize: 13,
+        color: '#696969',
+        marginTop:5
+    },
 });
