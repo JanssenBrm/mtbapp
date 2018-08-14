@@ -85,8 +85,9 @@ const styles = StyleSheet.create({
         marginRight:15,
         marginTop: 15,
         padding: 10,
-        backgroundColor: '#5a84cc',
-        color: '#FFFFFF'
+        backgroundColor: '#3d94f3',
+        color: '#FFFFFF',
+        borderRadius:10
     },
      infoView: {
         flex: 1,

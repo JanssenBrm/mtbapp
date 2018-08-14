@@ -1,77 +1,68 @@
 import React from 'react';
 import {ActivityIndicator, FlatList, View, StyleSheet, Text} from "react-native";
 import Moment from 'moment-timezone';
+import {ListItem} from "react-native-elements";
 
 export class RideInfo extends React.Component {
 
 
-    delta = 0.05;
+    info = [];
+
 
     constructor(props){
         super(props);
+
+        this.info.push({key: 'Date', value: Moment.unix(this.props.ride.date).format('ddd D MMMM YYYY')});
+        this.info.push({key: 'Address', value: `${this.props.ride.address.location}, ${this.props.ride.address.street}, ${this.props.ride.address.city}`});
+        this.info.push({key: 'Start', value: this.props.ride.time});
+        this.info.push({key: 'Distance', value: this.props.ride.distance});
+        this.info.push({key: 'Price', value: this.props.ride.price});
     }
     render() {
 
         return (
-            <View style={styles.table}>
-                <View style={styles.row}>
-                    <View style={styles.col}>
-                        <Text style={styles.header}>Date</Text>
-                        <Text style={styles.data}>{Moment.unix(this.props.ride.date).format('ddd D MMMM YYYY')}</Text>
-                    </View>
-                    <View style={styles.col}>
-                        <Text style={styles.header}>Address</Text>
-                        <Text style={styles.data}>{this.props.ride.address.location}{"\n"}{this.props.ride.address.street}{"\n"}{this.props.ride.address.city}</Text>
-                    </View>
-                </View>
-                <View style={styles.row}>
-                    <View style={styles.col}>
-                        <Text style={styles.header}>Start</Text>
-                        <Text style={styles.data}>{this.props.ride.time}</Text>
-                    </View>
-                    <View style={styles.col}>
-                        <Text style={styles.header}>Distance</Text>
-                        <Text style={styles.data}>{this.props.ride.distance}</Text>
-                    </View>
-                </View>
-                <View style={styles.row}>
-                    <View style={styles.col}>
-                        <Text style={styles.header}>Price</Text>
-                        <Text style={styles.data}>{this.props.ride.price}</Text>
-                    </View>
-                </View>
+            <View style={styles.list}>
+                <FlatList
+                    keyExtractor={this.keyExtractor}
+                    data={this.info}
+                    renderItem={this.renderItem}
+                />
             </View>
         );
 
+    }
+
+    keyExtractor = (item, index) => index;
+
+    renderItem ( item ) {
+        return <ListItem
+            title={item.item.key}
+            containerStyle={styles.listItem}
+            subtitle={item.item.value}
+            subtitleStyle={styles.subtitle}
+        />
     }
 }
 
 const styles = StyleSheet.create({
 
-    table: {
+    list: {
         flex: 1,
         justifyContent:'center',
-        alignItems:'flex-start',
-        padding:20
-    },
-
-    row: {
-        flex:2,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems:'flex-start',
-        height: 50
-    },
-
-    col: {
-        flex:1,
+        alignItems:'stretch',
         flexDirection: 'column',
+        padding: 20,
+        marginBottom: 15,
     },
-    header: {
-        fontSize: 15,
-        fontFamily: 'roboto-bold'
+
+    listItem: {
+        borderBottomWidth: 0
     },
-    data: {
-        fontFamily: 'roboto'
-    }
+
+    subtitle: {
+        fontStyle: 'italic',
+        fontSize: 13,
+        color: '#696969',
+        marginTop:5
+    },
 });
