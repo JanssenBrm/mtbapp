@@ -12,7 +12,7 @@ export class AppHeader extends React.Component {
 
         return (
             <Header
-                leftComponent={{ icon: 'menu', color: '#fff' }}
+                //leftComponent={{ icon: 'menu', color: '#fff' }}
                 centerComponent={{ text: this.props.title ? this.props.title : 'MTB Toertochten', style: styles.title }}
                 rightComponent={this.props.back ? { icon: 'arrow-back', color: '#fff', onPress: () => Actions.pop() } :  null}
             />
