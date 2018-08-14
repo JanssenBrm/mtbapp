@@ -19,7 +19,7 @@ export class RideWeatherConditions extends React.Component {
         this.weatherConditions.push({key: 'Condition', value: props.ride.weatherConditions.summary, icon: WEATHER_ICONS[props.ride.weatherConditions.icon].icon});
 
         if(props.ride.weatherConditions.precipProbability)
-            this.weatherConditions.push({key: 'Chance of rain', value: props.ride.weatherConditions.precipProbability});
+            this.weatherConditions.push({key: 'Chance of rain', value: `${props.ride.weatherConditions.precipProbability} %`});
         this.weatherConditions.push({key: 'Min temperature', value: `${props.ride.weatherConditions.temperatureMin} °C`});
         this.weatherConditions.push({key: 'Max temperature', value: `${props.ride.weatherConditions.temperatureHigh} °C`});
         this.weatherConditions.push({key: 'Wind speed', value: `${props.ride.weatherConditions.windSpeed} km/h`});
