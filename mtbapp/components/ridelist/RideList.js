@@ -62,6 +62,7 @@ class RideList extends React.Component {
                         style={styles.listView}
                         onRefresh={() => {this.props.getRideData(true);}}
                         refreshing={this.props.refresh}
+                        keyExtractor={(item, index) => index}
                     />
                 </View>
             );
@@ -88,7 +89,7 @@ class RideList extends React.Component {
                     <View style={styles.title}>
                         <Text style={styles.title_item}>{item.location}</Text>
                         <View style={styles.title_info}>
-                        {item.traveldistance ? (<Text style={styles.title_item}><Icon name='navigation' size='12'/>{item.traveldistance} km</Text>) : null}
+                        {item.traveldistance ? (<Text style={styles.title_item}><Icon name='navigation' size={12} />{item.traveldistance} km</Text>) : null}
                         {item.weatherConditions ? (
                             <Text style={styles.title_item}><Avatar source={WEATHER_ICONS[item.weatherConditions.icon].icon} size='small' containerStyle={styles.weatherIcon} overlayContainerStyle={styles.weatherIconContainer}  /></Text>) : null}
                         </View>
@@ -159,8 +160,6 @@ const styles = StyleSheet.create({
 
     title_info: {
         flexDirection: 'row',
-        textAlign: 'right',
-        fontSize: 12
     },
 
     description:{
