@@ -2,6 +2,7 @@ import React from 'react';
 import {ActivityIndicator, FlatList, View, StyleSheet, Text} from "react-native";
 import Moment from 'moment-timezone';
 import {ListItem} from "react-native-elements";
+import _ from 'lodash';
 
 export class RideInfo extends React.Component {
 
@@ -13,7 +14,7 @@ export class RideInfo extends React.Component {
         super(props);
 
         this.info.push({key: 'Date', value: Moment.unix(this.props.ride.date).format('ddd D MMMM YYYY')});
-        this.info.push({key: 'Address', value: `${this.props.ride.address.location}, ${this.props.ride.address.street}, ${this.props.ride.address.city}`});
+        this.info.push({key: 'Address', value: `${_.startCase(this.props.ride.address.location)}, ${_.startCase(this.props.ride.address.street)}, ${_.startCase(this.props.ride.address.city)}`});
         this.info.push({key: 'Start', value: this.props.ride.time});
         this.info.push({key: 'Distance', value: this.props.ride.distance});
         this.info.push({key: 'Price', value: this.props.ride.price});

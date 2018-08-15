@@ -311,7 +311,17 @@ class MTBBEScraper:
 
 
                 ride['accommodation'] = dict()
-                for part in divBlocks[-2].find_all('li'):
+
+                accomIdx = 6
+
+                for index, blocks in enumerate(divBlocks):
+                    if 'Accomodaties' in blocks.text:
+                        accomIdx = index
+
+
+                if len(divBlocks[accomIdx].find_all('li')) == 0:
+                    print('emtpry')
+                for part in divBlocks[accomIdx].find_all('li'):
                     key = accomodations[str(part.text).strip()]
                     if key:
                         ride['accommodation'][key] = ('check' in part.find('img')['src'])

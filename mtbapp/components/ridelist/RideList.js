@@ -9,6 +9,7 @@ import {Actions} from 'react-native-router-flux';
 import {AppHeader} from "../header/AppHeader";
 import Moment from 'moment-timezone';
 import {WEATHER_ICONS} from "../../mapping/weathericons.mapping";
+import _ from 'lodash';
 
 class RideList extends React.Component {
 
@@ -87,7 +88,7 @@ class RideList extends React.Component {
                 }
                 title={
                     <View style={styles.title}>
-                        <Text style={styles.title_item}>{item.location}</Text>
+                        <Text style={styles.title_item}>{_.startCase(item.location)}</Text>
                         <View style={styles.title_info}>
                         {item.traveldistance ? (<Text style={styles.title_item}><Icon name='navigation' size={12} />{item.traveldistance} km</Text>) : null}
                         {item.weatherConditions ? (

@@ -33,6 +33,7 @@ export const SET_FILTER = 'SET_FILTER';
                     });
 
                     Promise.all(promises).then(data => {
+                        data.sort((rideA, rideB) => rideA.date > rideB.date);
                         dispatch({type: LOAD_DATA_DONE, data: {rides: data, refresh: refresh}})
                     });
 

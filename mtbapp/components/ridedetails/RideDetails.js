@@ -13,6 +13,7 @@ import {RideInfo} from "../rideinfo/RideInfo";
 import {RideActions} from "../rideactions/RideActions";
 import {RideAccomodations} from "../rideaccomodations/RideAccomodations";
 import {RideWeatherConditions} from "../rideweatherconditions/RideWeatherConditions";
+import _ from 'lodash'
 
 export class RideDetails extends React.Component {
 
@@ -27,7 +28,7 @@ export class RideDetails extends React.Component {
         return (
             <View style={styles.container}>
                 <AppHeader back={true}/>
-                <Text style={styles.pageTitle}>{this.props.ride.location}</Text>
+                <Text style={styles.pageTitle}>{_.startCase(this.props.ride.location)}</Text>
                 <ScrollView style={styles.infoView}>
                     {
                         this.props.ride.geolocation.center? <MapView

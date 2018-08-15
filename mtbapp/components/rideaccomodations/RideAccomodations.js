@@ -17,7 +17,9 @@ export class RideAccomodations extends React.Component {
         bikecorner_guarded: 'Guarded bike corner',
         kids_tour: 'Kids tour',
         showers: 'Showers',
-        wash: 'Washing facilities'
+        wash: 'Washing facilities',
+        gender_seperate: 'Male/female seperate',
+        ride_stop: 'Refill station'
     };
 
     constructor(props) {
