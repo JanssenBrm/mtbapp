@@ -52,12 +52,19 @@ class FireBaseWriter:
         self.logger.info('Checking if ride %s exists' % ride['location'])
         exists = False;
 
-        locationRides = self.db.child('rides').order_by_child('location').equal_to(ride['location'].encode('utf-8')).get(
-            self.user['idToken'])
 
-        for hit in locationRides.each():
+        locationRides = list()
+        locationRides = self.db.child('rides').order_by_child('location').equal_to(
+            ride['location']).get(
+            self.user['idToken']).each()
+
+        locationRides = locationRides + self.db.child('rides').order_by_child('location').equal_to(
+            ride['location'].replace('-', ' ')).get(
+            self.user['idToken']).each()
+
+        for hit in locationRides:
             value = hit.val()
-            if ( value['date'] == ride['date'] and ('street' in value['address'] and 'street' in ride['address'] and value['address']['street'] == ride['address']['street'].encode('utf-8')) or ('location' in value['address'] and 'location' in ride['address'] and value['address']['location'] ==  ride['address']['location'].encode('utf-8'))):
+            if value['date'] == ride['date'] and ( self.fieldEquals('street', value['address'], ride['address']) or self.fieldEquals('location', value['address'], ride['address'])):
                 exists = True
 
         if exists:
@@ -65,6 +72,10 @@ class FireBaseWriter:
         else:
             self.logger.info('Ride %s does not exists in the database' % ride['location'])
         return exists;
+
+
+    def fieldEquals(self, field, itemA, itemB):
+        return (field in itemA and field in itemB) and (itemA[field] in itemB[field] or itemB[field] in itemA[field])
 
     def clear(self):
         self.logger.info('Clearing rides database')
@@ -133,17 +144,16 @@ class MTBYouScraper:
             soup = BeautifulSoup(requests.get(url).content, 'html.parser')
             pageRides = soup.find_all('tr', attrs={'class': ['tr1', 'tr2']})
             for ride in pageRides:
-                print("----------")
                 rideDetails = ride.find_all('td', attrs={'class', 'kalender_detail'})
 
                 ride = dict()
                 ride['date'] = long(pytz.timezone('UTC').localize(
                     datetime.datetime.strptime(rideDetails[1].text, '%d/%m/%Y')).strftime('%s'))
-                ride['location'] = rideDetails[2].text
+                ride['location'] = str(rideDetails[2].text.encode('utf-8')).lower()
                 ride['distance'] = rideDetails[3].text
                 ride['time'] = rideDetails[4].text
 
-                currDate =  datetime.datetime.strptime(rideDetails[1].text, '%d/%m/%Y')
+                currDate = datetime.datetime.strptime(rideDetails[1].text, '%d/%m/%Y')
 
                 rideUrl = '%s%s' % (self.baseurl, rideDetails[2].find('a').get('href'))
                 rideSoup = BeautifulSoup(requests.get(rideUrl).content, 'html.parser')
@@ -151,7 +161,6 @@ class MTBYouScraper:
                 rideInfoBlocks = rideSoup.find_all('table', attrs={'class', 'kalender_overzicht2'})
 
                 ride['source'] = rideUrl
-                ride['address'] = ''
 
                 nextAddress = ''
                 ride['address'] = dict()
@@ -165,7 +174,7 @@ class MTBYouScraper:
                         nextAddress = 'city'
 
                     if not str(part.encode('utf-8')).startswith('<'):
-                        ride['address'][nextAddress] = part
+                        ride['address'][nextAddress] = str(part.encode('utf-8')).lower()
 
                 params = list()
                 poi = False
@@ -212,10 +221,127 @@ class MTBYouScraper:
         return accomodations
 
 
+class MTBBEScraper:
+
+    def __init__(self, logger, db):
+        self.db = db
+        self.baseurl = 'https://www.mountainbike.be'
+        self.url = '%s/toertochten-overzicht' % self.baseurl
+        self.logger = logger
+        self.geocoder = GeoCoder()
+
+    def scrape(self):
+        self.scrapeCalendar()
+
+    def scrapeCalendar(self):
+
+        accomodations = self.accomodations()
+        startDate = datetime.datetime.now()
+        endDate = datetime.datetime(startDate.year, startDate.month + 1, startDate.day)
+        currDate = startDate
+
+        # while currDate < endDate:
+        #url = '%s&datum=%s' % (self.url, currDate.strftime('%Y-%m-%d'))
+        url = self.url
+        self.logger.info('Scraping %s' % url)
+        soup = BeautifulSoup(requests.get(url).content, 'html.parser')
+        rideTable = soup.find_all('div', attrs={'class': ['pad-l-tny', 'pad-r-tny']})
+        dateRides = rideTable[1].find_all('div', attrs={
+            'class': ['row', 'collapse', 'border-solid', 'border-bottom', 'border-iron', 'font-steel', 'pad-b-tny']})
+
+        for dateElem in dateRides:
+            date = dateElem.find('div', attrs={'class': ['small-2', 'column']})
+            rides = dateElem.find_all('a')
+
+            for rideElem in rides:
+                rideDetails = rideElem.find_all('div', attrs={'class', 'column'})
+
+                ride = dict()
+
+                # @TODO: Check if the date is not in the next year
+
+                ride['date'] = long(pytz.timezone('UTC').localize(
+                    datetime.datetime.strptime(str(date.text).strip().split(' ')[1] + '/' + str(currDate.year), '%d/%m/%Y')).strftime('%s'))
+                ride['location'] = str(rideDetails[2].text.encode('utf-8')).strip().lower()
+                ride['distance'] = str(rideDetails[3].text).strip()
+                ride['time'] = str(rideDetails[4].text).strip()
+
+                currDate = datetime.datetime.strptime(str(date.text).strip().split(' ')[1] + '/' + str(currDate.year), '%d/%m/%Y')
+
+                rideUrl = '%s%s' % (self.baseurl, rideElem.get('href'))
+                rideSoup = BeautifulSoup(requests.get(rideUrl).content, 'html.parser')
+
+                ride['source'] = rideUrl
+                ride['address'] = dict()
+
+                divBlocks = rideSoup.find_all('div', attrs={'class': ['mrg-r-small', 'pad-t-tny']})
+
+                locationBlock = divBlocks[4]
+                for index, line in enumerate(locationBlock.text.split('\n')[4:-1]):
+                    value = str(line.encode('utf-8')).strip().lower()
+                    if index == 0 and value:
+                        ride['address']['location'] = value
+                    elif index == 1 and value:
+                        ride['address']['street'] = value
+                    elif index == 2 and value:
+                        ride['address']['city'] = value
+
+
+                params = list()
+                poi = False
+                if 'street' in ride['address']:
+                    params.append(ride['address']['street'])
+                elif 'location' in ride['address']:
+                    params.append(ride['address']['location'])
+                    poi = True
+
+                if 'city' in ride['address']:
+                    params.append(ride['address']['city']);
+
+                ride['geolocation'] = self.geocoder.GeoCodeReverse(params, poi)
+
+
+                priceElems =  divBlocks[6].text.strip().split('\n')
+
+                if  len(priceElems) > 2:
+                    ride['price'] = divBlocks[6].text.strip().split('\n')[2].strip()
+                else:
+                    ride['price'] = ''
+
+
+
+                ride['accommodation'] = dict()
+                for part in divBlocks[-2].find_all('li'):
+                    key = accomodations[str(part.text).strip()]
+                    if key:
+                        ride['accommodation'][key] = ('check' in part.find('img')['src'])
+
+                self.logger.info('Details %s' % ride)
+
+                if not self.db.rideExists(ride):
+                    self.db.add(ride)
+
+    def accomodations(self):
+        accomodations = dict()
+        accomodations['Bewaakte fietsstand'] = 'bikecorner_guarded'
+        accomodations['Man / Vrouw apart'] = 'gender_seperate'
+        accomodations['Douches'] = 'showers'
+        accomodations['Kleedkamers'] = 'showers'
+        accomodations['Afspuitstand'] = 'bike_clean'
+        accomodations['Fietsverhuur'] = 'bike_rent'
+        accomodations['Bevoorrading'] = 'ride_stop'
+        return accomodations
+
+
 logger = setupLogger();
 
 db = FireBaseWriter(logger)
 
-#db.clear()
+db.clear()
+
+scraper = MTBBEScraper(logger, db)
+scraper.scrape()
+
 scraper = MTBYouScraper(logger, db)
 scraper.scrape()
+
